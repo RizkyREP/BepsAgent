@@ -1,4 +1,5 @@
   import 'package:bepsagent/login.dart';
+    import 'package:bepsagent/main.dart';
   
   var getResponse;
   var postDevResponse;
@@ -8,14 +9,27 @@
 
 //=================================================================================
 
-
-  String loginUrl(){
-    return 'http://192.168.0.116:8080/tms-api/oauth/token?client_id='+userInput+'&client_secret='+client_secret+'&device='+device+'&grant_type='+grant_type+'&deviceId='+deviceId+'&username='+username+'&password='+password;
+  String getUserInfo(){
+    return 'http://192.168.0.116:8080/tms-api/oauth/token?client_id='+client_id+'&client_secret='+client_secret+'&device='+device+'&grant_type='+grant_type+'&deviceId='+deviceId+'&username='+userInput+'&password='+passwordInput;
   }
 
-  var searchUrl = 'http://192.168.0.116:8080/tms-api/v2/user/find?username=store4';
+  String loginUrl(){
+    return 'http://192.168.0.116:8080/tms-api/oauth/token?client_id='+client_id+'&client_secret='+client_secret+'&device='+device+'&grant_type='+grant_type+'&deviceId='+deviceId+'&username='+userInput+'&password='+passwordInput;
+  }
 
+  String userInfoUrl(){
+    return 'http://192.168.0.116:8080/tms-api/v2/user/find?username='+userInput;
+  }
 
+  // String incorrectUsername(){
+  //   try {
+  //   return '${postDevResponse['error_description']}';
+  //    } catch (e) {
+  //     print("Error");
+  //     return ("Error");
+  //     isVisible = !isVisible;
+  //   }
+  // }
 
   //= 'http://192.168.0.116:8080/tms-api/oauth/token?client_id='+userInput+'&client_secret='+client_secret+'&device='+device+'&grant_type='+grant_type+'&deviceId='+deviceId+'&username='+username+'&password='+password;
 
@@ -25,7 +39,7 @@
   var device = 'web';
   var grant_type = 'password';
   var deviceId = '1002';
-  var username = 'admin';
+  var username = '${postDevResponse['username']}';
   var password = 'admin';
 
   var access_token;
@@ -35,5 +49,6 @@
   var scope;
 
   var email;
+  var merchantId;
 
   //=================================================================================

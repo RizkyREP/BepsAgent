@@ -1,30 +1,46 @@
 import 'dart:convert';
-
+import 'package:bepsagent/dashboard.dart';
+import 'package:bepsagent/var.dart';
 import 'package:bepsagent/var.dart' as prefix0;
+import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:flutter/material.dart';
 
+import 'package:bepsagent/Service.dart';
 import 'package:bepsagent/main.dart';
 import 'package:bepsagent/var.dart';
 import 'package:http/http.dart' as http;
 
 //-----IMPORTS-------------------------------------------------------------------------------------------//
 
+class MyCrud extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'BepsAgent Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: Login(),
+    );
+  }
+}
+
 class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
-  
 }
 
 String userInput = "";
-String passwordInput = "Password Kosong";
-
+String passwordInput = "";
+bool isVisible = false;
 
 class _LoginState extends State<Login> {
-
-  Future<String> postDev() async {
+  Future<String> login() async {
     try {
       setState(() {
         userInput = userInput;
+        passwordInput = passwordInput;
       });
 
       http.Response response = await http.post(Uri.encodeFull(loginUrl()),
@@ -32,13 +48,48 @@ class _LoginState extends State<Login> {
       postDevResponse = json.decode(response.body);
 
       print(postDevResponse);
-      // print('Access Token : ${postDevResponse['access_token']}');
+      print('Access Token : ${postDevResponse['access_token']}');
       print('$userInput');
       print('$passwordInput');
+      access_token = '${postDevResponse['access_token']}';
+
+      http.Response responseGet =
+          await http.get(Uri.encodeFull(userInfoUrl()), headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + access_token,
+      });
+      getResponse = json.decode(responseGet.body);
+      getDevResponse = getResponse;
+      print(getResponse[0]['email']);
+      setState(() {
+        email = (getResponse[0]['email']);
+        username = (getResponse[0]['username']);
+        merchantId = (getResponse[0]['merchantId']);
+      });
+
+      if (getResponse[0]['email'] != null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Dashboard()));
+      }
     } catch (e) {
       print("No Connection to Om Hansen");
     }
   }
+
+  // Future<String> getuserInfo() async {
+  //   http.Response response =
+  //       await http.get(Uri.encodeFull(userInfoUrl()), headers: {
+  //     'Content-Type': 'application/json',
+  //     'Authorization': 'Bearer ' + access_token,
+  //   });
+  //   getResponse = json.decode(response.body);
+  //   setState(() {
+  //     getDevResponse = getResponse;
+  //   });
+  //   print(getResponse[1]['email']);
+  // }
+
+  //------------------------------------------------------------------------------------------------------//
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,6 +104,7 @@ class _LoginState extends State<Login> {
               color: Colors.grey[200],
               width: 300,
               child: TextField(
+                controller: TextEditingController()..text = '$userInput',
                 onChanged: (usertext) {
                   userInput = usertext;
                 },
@@ -77,6 +129,8 @@ class _LoginState extends State<Login> {
               color: Colors.grey[200],
               width: 300,
               child: TextField(
+                obscureText: true,
+                // controller: TextEditingController()..text = '$passwordInput',
                 onChanged: (text) {
                   passwordInput = text;
                 },
@@ -93,13 +147,16 @@ class _LoginState extends State<Login> {
             ),
           ),
           SizedBox(
-            height: 30,
+            height: 10,
+          ),
+          SizedBox(
+            height: 20,
           ),
           MaterialButton(
             height: 40,
             minWidth: 100,
             color: Colors.blue[100],
-            onPressed: postDev,
+            onPressed: login,
             child: Text("Login"),
           )
         ],
@@ -107,8 +164,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-
-// {
-//   Navigator.pushReplacement(
-//       context, MaterialPageRoute(builder: (context) => MyCrud()))
-// },
