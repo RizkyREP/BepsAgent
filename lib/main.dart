@@ -3,17 +3,15 @@ import 'dart:convert';
 
 import 'package:bepsagent/login.dart';
 import 'package:bepsagent/var.dart';
-import 'package:bepsagent/var.dart' as prefix0;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:bepsagent/var.dart';
 import 'package:bepsagent/login.dart';
-import 'package:bepsagent/Service.dart';
 
 //=================================================================================
 
-void main() => runApp(MyCrud());
+void main() => runApp(MyLogin());
 // var post = Post();
 
 class Crud extends StatefulWidget {
@@ -163,20 +161,6 @@ class _CrudState extends State<Crud> {
                               fontWeight: FontWeight.normal, fontSize: 15),
                         ),
                       )),
-                  // MaterialButton(
-                  //     height: 50,
-                  //     minWidth: 100,
-                  //     color: Colors.grey[100],
-                  //     onPressed: post,
-                  //     child: Align(
-                  //       alignment: Alignment.center,
-                  //       child: Text(
-                  //         "Post Dev",
-                  //         textAlign: TextAlign.center,
-                  //         style: TextStyle(
-                  //             fontWeight: FontWeight.normal, fontSize: 15),
-                  //       ),
-                  //     )),
                   MaterialButton(
                       height: 50,
                       minWidth: 100,

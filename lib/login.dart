@@ -2,20 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:bepsagent/dashboard.dart';
 import 'package:bepsagent/var.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import 'package:flutter/material.dart';
 
-import 'package:bepsagent/Service.dart';
-import 'package:bepsagent/main.dart';
 import 'package:bepsagent/var.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
-import 'package:ssl_pinning_plugin/ssl_pinning_plugin.dart';
 
 //-----IMPORTS-------------------------------------------------------------------------------------------//
 
-class MyCrud extends StatelessWidget {
+class MyLogin extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -32,8 +28,6 @@ class Login extends StatefulWidget {
   @override
   _LoginState createState() => _LoginState();
 }
-
-bool isVisible = false;
 
 class _LoginState extends State<Login> {
   Future<String> login() async {
@@ -68,29 +62,27 @@ class _LoginState extends State<Login> {
       getResponse = json.decode(responseGetUserInfo.body);
       getDevResponse = getResponse;
       print(getResponse[0]['email']);
+      email = (getResponse[0]['email']);
+      username = (getResponse[0]['username']);
       if (getResponse[0]['merchantId'] != null) {
         setState(() {
-          email = (getResponse[0]['email']);
-          username = (getResponse[0]['username']);
           merchantId = (getResponse[0]['merchantId']);
         });
+        http.Response responseGetMerchantInfo =
+            await ioClient.get(Uri.encodeFull(merchantInfoUrl()), headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + access_token,
+        });
+        getMerchantResponse = json.decode(responseGetMerchantInfo.body);
+        getMerchantResponse = getMerchantResponse;
+        print(getMerchantResponse[0]['name']);
+        if (getMerchantResponse[0]['name'] != null) {
+          setState(() {
+            merchantName = (getMerchantResponse[0]['name']);
+          });
+        }
       } else {
         merchantId = "Tidak memiliki merchant";
-      }
-
-      http.Response responseGetMerchantInfo =
-          await ioClient.get(Uri.encodeFull(merchantInfoUrl()), headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + access_token,
-      });
-      getMerchantResponse = json.decode(responseGetMerchantInfo.body);
-      getMerchantResponse = getMerchantResponse;
-      print(getMerchantResponse[0]['name']);
-      if (getMerchantResponse[0]['name'] != null) {
-        setState(() {
-          merchantName = (getMerchantResponse[0]['name']);
-        });
-      } else {
         merchantName = "Tidak memiliki merchant";
       }
 
@@ -108,11 +100,11 @@ class _LoginState extends State<Login> {
     }
   }
 
-
   //------------------------------------------------------------------------------------------------------//
 
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomPadding: false,
       body: Container(
         child: isLoading
             ? Center(
@@ -121,7 +113,14 @@ class _LoginState extends State<Login> {
             : Column(
                 children: <Widget>[
                   SizedBox(
-                    height: 150,
+                    height: 70,
+                  ),
+                  Image.asset(
+                    '$imgBepsnet',
+                    width: 200,
+                  ),
+                  SizedBox(
+                    height: 50,
                   ),
                   Align(
                     alignment: Alignment.center,
@@ -129,7 +128,6 @@ class _LoginState extends State<Login> {
                       color: Colors.grey[200],
                       width: 300,
                       child: TextField(
-                        controller: TextEditingController()..text = username,
                         onChanged: (usertext) {
                           userInput = usertext;
                         },
@@ -174,15 +172,19 @@ class _LoginState extends State<Login> {
                     height: 10,
                   ),
                   SizedBox(
-                    height: 20,
+                    height: 10,
                   ),
                   MaterialButton(
                     height: 40,
                     minWidth: 100,
-                    color: Colors.blue[100],
+                    color: Colors.blue[500],
                     onPressed: login,
-                    child: Text("Login"),
-                  )
+                    child: Text(
+                      "Login",
+                      style: TextStyle(
+                          fontWeight: FontWeight.normal, color: Colors.white),
+                    ),
+                  ),
                 ],
               ),
       ),

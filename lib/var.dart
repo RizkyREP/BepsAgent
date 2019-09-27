@@ -9,6 +9,7 @@ var password = '';
 var getResponse;
 var getDevResponse;
 var postDevResponse;
+var trxResponse;
 var merchantResponse;
 var getMerchantResponse;
 var body;
@@ -24,22 +25,19 @@ var email;
 var merchantId;
 var merchantName;
 
-var userInput='';
+var userInput = '';
 var passwordInput;
 bool isLoading = false;
-
-
+var trx;
 
 //=================================================================================
 
-// usernameField() {
-//   if ('$userInput' != null) {
-//     return '';
-//   }
-//   else
-//   return '$userInput';
-// }
+var imgBepsnet = 'assets/images/bepsnet.png';
+var imgCashbac = 'assets/images/cashbac.jpg';
+var imgCashbacBig = 'assets/images/cashbac_big.png';
+var imgPaybyqr = 'assets/images/paybyqr.png';
 
+//=================================================================================
 
 String loginUrl() {
   return 'https://192.168.4.26:8443/tms-5.0/oauth/token?client_id=' +
@@ -63,19 +61,14 @@ String userInfoUrl() {
 }
 
 String merchantInfoUrl() {
-  return 'https://192.168.4.26:8443/tms-5.0/v2/merchant-store/find?merchantGroupId=52046';
+  return 'https://192.168.4.26:8443/tms-5.0/v2/merchant-store/find?merchantGroupId=' +
+      '$merchantId';
+}
+
+String getTrxUrl() {
+  return 'https://192.168.4.26:8443/tms-5.0/v2/txn-log/getAllLogTrxByMerchantV2?merchantId=' +
+      '$merchantId';
 }
 
 //=================================================================================
 
-//  Future<String> check({ String urlD, Map<String, String> headerHttp, SHA sha, List<String> allowedSHAFingerprints, int timeout }) async {
-//   final Map<String, dynamic> params = <String, dynamic>{
-//     "url" : 'https://192.168.4.26:8443/tms-5.0/oauth/token?client_id=bepsnet18&client_secret=beps&device=web&grant_type=password&deviceId=1002&username=admin&password=admin',
-//     "headers" : {'Accept': 'application/json'}, body: json.encode({}),
-//     "type": sha.toString().split(".").last,
-//     "fingerprints" : allowedSHAFingerprints,
-//     "timeout" : 30
-//   };
-//   String resp = await _channel.invokeMethod('check', params);
-//   return resp;
-// }

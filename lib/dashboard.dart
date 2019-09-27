@@ -1,14 +1,19 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:bepsagent/login.dart';
 import 'package:bepsagent/var.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:bepsagent/login.dart';
+import 'package:bepsagent/profil.dart';
+import 'package:http/io_client.dart';
 
+import 'list.dart';
 
 //=================================================================================
 
-class MyCrud extends StatelessWidget {
+class MyDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,20 +26,58 @@ class MyCrud extends StatelessWidget {
 }
 
 class Dashboard extends StatefulWidget {
-  // Dashboard({Key key}) : super(key: key);
   @override
-  _CrudState createState() => _CrudState();
+  _DashboardState createState() => _DashboardState();
 }
 
-class _CrudState extends State<Dashboard> {
-  
+class _DashboardState extends State<Dashboard> {
   logout() {
+    setState(() {
+      access_token = null;
+      merchantName = null;
+    });
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => Login()));
-    access_token = null;
   }
-  
 
+  getTrx() async {
+    bool trustSelfSigned = true;
+    HttpClient httpClient = new HttpClient()
+      ..badCertificateCallback =
+          ((X509Certificate cert, String host, int port) => trustSelfSigned);
+    IOClient ioClient = new IOClient(httpClient);
+
+    http.Response trxResponses =
+        await ioClient.get(Uri.encodeFull(getTrxUrl()), headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + access_token,
+    });
+
+    trxResponse = json.decode(trxResponses.body);
+    print(trxResponse['content'][0]['id']);
+    setState(() {
+      data = trxResponse['content'][0]['id'];
+    });
+  }
+
+  bool btnSummary = true;
+  bool btnTrx = false;
+  
+  void _button1() {
+    setState(() {
+      btnSummary = true;
+      btnTrx = false;
+    });
+  }
+
+  void _button2() {
+    setState(() {
+      btnSummary = false;
+      btnTrx = true;
+    });
+  }
+
+  List data;
 //=================================================================================
 
   @override
@@ -59,11 +102,34 @@ class _CrudState extends State<Dashboard> {
                 ),
               ),
             ),
+            Container(
+              color: Colors.blue[50],
+              child: ListTile(
+                title: Text('Dashboard'),
+                // onTap: () {
+                //   Navigator.pushReplacement(
+                //       context, MaterialPageRoute(builder: (context) => Profil()));
+                // },
+              ),
+            ),
+            ListTile(
+              title: Text('Profil'),
+              onTap: () {
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => Profil()));
+              },
+            ),
+            ListTile(
+              title: Text('List Transaksi'),
+              onTap: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => ListTrx()));
+              },
+            ),
             ListTile(
               title: Text('Logout'),
               onTap: () {
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (context) => Login()));
+                logout();
               },
             ),
           ],
@@ -74,97 +140,67 @@ class _CrudState extends State<Dashboard> {
 
       appBar: AppBar(
         title: Text('Dashboard'),
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48.0),
+          child: Row(children: <Widget>[
+            Container(
+              width: 180,
+              height: 50,
+              child: FlatButton(
+                  child: Text(
+                    "Summary",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  color: btnSummary ? Colors.blue[400] : Colors.blue,
+                  onPressed: () => _button1()
+                  ),
+            ),
+            Container(
+              width: 180,
+              height: 50,
+              child: FlatButton(
+                  child: Text(
+                    "Transaction",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.normal),
+                  ),
+                  color: btnTrx ? Colors.blue[400] : Colors.blue,
+                  onPressed: () => _button2()
+                  ),
+            ),
+          ]),
+        ),
       ),
+
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(
           children: <Widget>[
-            Container(
-                height: 30,
-                width: 400,
-                color: Colors.blueGrey[50],
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "User Data",
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 15),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: <Widget>[
+                  // MaterialButton(
+                  //     height: 50,
+                  //     minWidth: 350,
+                  //     color: Colors.grey[100],
+                  //     onPressed: getTrx,
+                  //     child: Align(
+                  //       alignment: Alignment.center,
+                  //       child: Text(
+                  //         "Get Trx Data",
+                  //         textAlign: TextAlign.center,
+                  //         style: TextStyle(
+                  //             fontWeight: FontWeight.normal, fontSize: 15),
+                  //       ),
+                  //     )),
+                  SizedBox(
+                    height: 15,
                   ),
-                )),
-            Container(
-                padding: const EdgeInsets.only(left: 8.0, top: 10),
-                height: 90,
-                width: 400,
-                color: Colors.grey[100],
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Username : $username\n"
-                    "Email : $email\n",
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-                  ),
-                )),
-            SizedBox(
-              height: 15,
+                ],
+              ),
             ),
-            Container(
-                height: 30,
-                width: 400,
-                color: Colors.blueGrey[50],
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Merchant Data",
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 15),
-                  ),
-                )),
-            Container(
-                padding: const EdgeInsets.only(left: 8.0, top: 10),
-                height: 90,
-                width: 400,
-                color: Colors.grey[100],
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Merchant ID : $merchantId\n"
-                    "Merchant Name : $merchantName\n",
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-                  ),
-                )),
-            Container(
-                height: 30,
-                width: 400,
-                color: Colors.blueGrey[50],
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    "Store List",
-                    textAlign: TextAlign.center,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 15),
-                  ),
-                )),
-            Container(
-                padding: const EdgeInsets.only(left: 8.0, top: 10),
-                height: 90,
-                width: 400,
-                color: Colors.grey[100],
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Text(
-                    "Store 1 = ",
-                    textAlign: TextAlign.left,
-                    style:
-                        TextStyle(fontWeight: FontWeight.normal, fontSize: 12),
-                  ),
-                )),
           ],
         ),
       ),
