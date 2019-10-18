@@ -30,6 +30,12 @@ var passwordInput;
 bool isLoading = false;
 var trx;
 
+bool btnSummary = true;
+bool btnTrx = false;
+List data;
+List reversedData = data.reversed.toList();
+DateTime _currentDate;
+
 //=================================================================================
 
 var imgBepsnet = 'assets/images/bepsnet.png';
@@ -72,3 +78,7 @@ String getTrxUrl() {
 
 //=================================================================================
 
+endSession() {
+  access_token = null;
+  merchantName = null;
+}

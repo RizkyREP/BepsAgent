@@ -3,18 +3,16 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bepsagent/profil.dart';
-import 'package:bepsagent/var.dart' as prefix0;
 import 'package:flutter/material.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
 
-import 'dashboard.dart';
+import 'dashboard.dart' as dashboard;
 import 'login.dart';
 import 'var.dart';
 
 class MyListTrx extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return new MaterialApp();
@@ -28,8 +26,7 @@ class ListTrx extends StatefulWidget {
 
 class _ListTrxState extends State<ListTrx> {
   List data;
-  int perPage = 10;
-  int present = 0;
+
 
   Future<Map<String, dynamic>> getTrx() async {
     setState(() {
@@ -60,24 +57,6 @@ class _ListTrxState extends State<ListTrx> {
       print("Fetch Data Failed");
     }
   }
-
-  // var imgs;
-
-  // getImg() {
-  //   if (trxResponse['content']['acqName'] == 'CASHBAC') {
-  //     setState(() {
-  //       imgs = {'$imgCashbac'};
-  //     });
-  //   } else if (trxResponse['content']['acqName'] == 'CASHBAC') {
-  //     setState(() {
-  //       imgs = {'$imgPaybyqr'};
-  //     });
-  //   } else {
-  //     setState(() {
-  //       imgs = {'$imgBepsnet'};
-  //     });
-  //   }
-  // }
 
   logout() {
     setState(() {
@@ -120,7 +99,7 @@ class _ListTrxState extends State<ListTrx> {
                 title: Text('Dashboard'),
                 onTap: () {
                   Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => Dashboard()));
+                      MaterialPageRoute(builder: (context) => dashboard.Dashboard()));
                 },
               ),
               ListTile(
@@ -163,24 +142,6 @@ class _ListTrxState extends State<ListTrx> {
                 : ListView.builder(
                     itemCount: data == null ? 0 : data.length,
                     itemBuilder: (BuildContext context, i) {
-                      // getImg() {
-                      //   if (data[i]['acqName'] == 'CASHBAC') {
-                      //     return {'$imgCashbac'};
-                      //   } else if (data[i]['acqName'] == 'PAYBYQR') {
-                      //     return {'$imgCashbac'};
-                      //   } else {
-                      //     setState(() {
-                      //       return {'$imgCashbac'};
-                      //     });
-                      //   }
-                      // }
-
-                      // if (data[i]['acqName'] == 'CASHBAC') {
-                      //   print('cashbac');
-                      // } else if (data[i]['acqName'] == 'PAYBYQR') {
-                      //   print('paybyqr');
-                      // }
-
                       return Container(
                         color: Colors.grey[300],
                         child: Card(
@@ -205,7 +166,7 @@ class _ListTrxState extends State<ListTrx> {
                                   context,
                                   new MaterialPageRoute(
                                       builder: (BuildContext context) =>
-                                          new SecondPage(data[i])));
+                                          new DetailTransaksi(data[i])));
                             },
                           ),
                         ),
@@ -216,8 +177,8 @@ class _ListTrxState extends State<ListTrx> {
   }
 }
 
-class SecondPage extends StatelessWidget {
-  SecondPage(this.data);
+class DetailTransaksi extends StatelessWidget {
+  DetailTransaksi(this.data);
   final data;
 
   @override

@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:bepsagent/login.dart';
 
-import 'list.dart';
+import 'detailTransaksi.dart';
 
 //=================================================================================
 
